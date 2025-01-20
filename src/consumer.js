@@ -14,8 +14,15 @@ const init = async () => {
     await channel.assertQueue('otp:register', {
         durable: true,
       });
-
-    channel.consume('otp:register', listener.listenOtp, { noAck: true })
+    await channel.assertQueue('payment:success', {
+      durable: true,
+    });
+    await channel.assertQueue('payment:failed', {
+      durable: true,
+    });
+    channel.consume('otp:register', listener.listenOtp, { noAck: true });
+    channel.consume('payment:success', listener.listenPaymentsSuccess, { noAck: true });
+    channel.consume('payment:failed', listener.listenPaymentsFailed, { noAck: true });
 }
 
 init();
