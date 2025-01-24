@@ -75,6 +75,66 @@ class MailSender {
     return await this._transporter.sendMail(mailOptions);
 }
 
+async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate, endDate, emailsDb) {
+  const emails = emailsDb.map(row => row.email);
+  const mailOptions = {
+    from: process.env.SMTP_EMAIL,
+    to: emails.join(','), // Menggabungkan array emails menjadi string yang dipisahkan koma
+    subject: `Permohonan Penyewaan dari User ${userId}`,
+    text: `
+      Halo,
+
+      User dengan ID ${userId} telah mengajukan permohonan penyewaan dengan detail sebagai berikut:
+
+      - ID Penyewaan: ${rentalId}
+      - ID Pembayaran: ${paymentId}
+      - Biaya: Rp${cost.toLocaleString('id-ID')}
+      - Tanggal Mulai: ${startDate}
+      - Tanggal Selesai: ${endDate}
+
+      Mohon untuk segera meninjau permohonan ini. Terima kasih.
+
+      Salam,
+      Sistem Otomasi
+    `,
+  };
+  return await this._transporter.sendMail(mailOptions);
+}
+
+  async sendNotificationRentalPaymentToUser(userId, rentalId, paymentId, cost, startDate, endDate, email) {
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: `Segera Lakukan Pembayaran untuk Rental ID ${rentalId}`,
+      text: `
+  Halo,
+  
+  Kami ingin menginformasikan bahwa permohonan rental Anda dengan detail sebagai berikut:
+  
+  - Rental ID: ${rentalId}
+  - Payment ID: ${paymentId}
+  - Biaya: Rp${cost.toLocaleString('id-ID')}
+  - Tanggal Mulai: ${startDate}
+  - Tanggal Selesai: ${endDate}
+  
+  Harap segera melakukan pembayaran untuk menyelesaikan proses rental Anda. Berikut adalah informasi rekening untuk pembayaran:
+  
+  Rekening Bank:
+  - BNI: 1234567890 (a.n. PT Rental Indonesia)
+  - BRI: 9876543210 (a.n. PT Rental Indonesia)
+  - BCA: 1122334455 (a.n. PT Rental Indonesia)
+  
+  Pastikan untuk mencantumkan Payment ID sebagai berita transfer untuk mempermudah proses verifikasi.
+  
+  Jika Anda membutuhkan bantuan lebih lanjut, silakan hubungi kami.
+  
+  Terima kasih,
+  Tim Rental
+      `
+    };
+    return await this._transporter.sendMail(mailOptions);
+  } 
+
 }
 
 export default MailSender;
