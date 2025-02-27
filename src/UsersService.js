@@ -23,6 +23,15 @@ class UsersService {
         const result = await this._pool.query(query);
         return result.rows[0].email;
     }
+
+    async getUserId(email) {
+        const query = {
+            text: 'SELECT id FROM users WHERE email = $1',
+            values: [email],
+        };
+        const result = await this._pool.query(query);
+        return result.rows[0].id;
+    }
 }
 
 export default UsersService;

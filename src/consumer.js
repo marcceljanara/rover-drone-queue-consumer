@@ -3,13 +3,15 @@ import amqp from 'amqplib';
 import Listener from './listener.js';
 import MailSender from './MailSender.js';
 import UsersService from './UsersService.js';
+import NotificationsService from './NotificationsService.js';
 
 dotenv.config();
 
 const init = async () => {
     const mailSenser = new MailSender();
     const usersService = new UsersService();
-    const listener = new Listener(mailSenser, usersService);
+    const notificationsService = new NotificationsService();
+    const listener = new Listener(mailSenser, usersService, notificationsService);
 
     const connection = await amqp.connect(process.env.RABBITMQ_SERVER);
     const channel = await connection.createChannel();

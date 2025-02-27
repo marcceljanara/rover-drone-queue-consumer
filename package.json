@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:prod": "node src/consumer.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,7 @@
   "dependencies": {
     "amqplib": "^0.10.5",
     "dotenv": "^16.4.7",
+    "nanoid": "^5.1.2",
     "nodemailer": "^6.9.16",
     "pg": "^8.13.1"
   },

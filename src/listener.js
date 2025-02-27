@@ -1,7 +1,8 @@
 class Listener {
-    constructor(mailSender, usersService) {
+    constructor(mailSender, usersService, notificationsService) {
       this._mailSender = mailSender;
       this._usersService = usersService;
+      this._notificationsService = notificationsService;
 
       this.listenOtp = this.listenOtp.bind(this);
       this.listenPaymentsSuccess = this.listenPaymentsSuccess.bind(this);
@@ -13,6 +14,14 @@ class Listener {
     async listenOtp(message) {
       try {
         const { otp, email } = JSON.parse(message.content.toString());
+        const id = await this._usersService.getUserId(email);
+        await this._notificationsService.addLogNotification(
+          {
+            userId: id,
+            notificationType: 'INFO',
+            messageContent: `Mengirimkan kode otp ke email: ${email}`,
+          }
+        );
         const result = await this._mailSender.sendOtpMail(email, otp);
         console.log(result);
       } catch (error) {
@@ -23,6 +32,14 @@ class Listener {
     async listenPaymentsSuccess(message) {
       try {
         const { email, fullname } = JSON.parse(message.content.toString());
+        const id = await this._usersService.getUserId(email);
+        await this._notificationsService.addLogNotification(
+          {
+            userId: id,
+            notificationType: 'INFO',
+            messageContent: `Mengirimkan notifikasi pembayaran sukses kepada ${fullname} dengan email: ${email}`,
+          }
+        );
         const result = await this._mailSender.sendNotificationPaymentSuccess(email, fullname);
         console.log(result);
       } catch (error) {
@@ -34,6 +51,14 @@ class Listener {
       try {
         const { email, fullname, rentalId } = JSON.parse(message.content.toString());
         const result = await this._mailSender.sendNotificationPaymentFailed(email, fullname, rentalId);
+        const id = await this._usersService.getUserId(email);
+        await this._notificationsService.addLogNotification(
+          {
+            userId: id,
+            notificationType: 'ERROR',
+            messageContent: `Mengirimkan notifikasi pembayaran gagal kepada ${fullname} dengan email: ${email} pada rental: ${rentalId}`,
+          }
+        );
         console.log(result);
       } catch (error) {
         console.error(error);
@@ -45,6 +70,13 @@ class Listener {
         const { userId, rentalId, paymentId, cost, startDate, endDate } = JSON.parse(message.content.toString());
         const emailsDb = await this._usersService.getAllEmailAdmin();
         const result = await this._mailSender.sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate, endDate, emailsDb);
+        await this._notificationsService.addLogNotification(
+          {
+            userId,
+            notificationType: 'INFO',
+            messageContent: `Mengirimkan notifikasi permintaan rental kepada admin agar bisa diproses`,
+          }
+        );
         console.log(result);
       } catch (error) {
         console.log(error);
@@ -55,6 +87,13 @@ class Listener {
       try {
         const { userId, rentalId, paymentId, cost, startDate, endDate } = JSON.parse(message.content.toString());
         const email = await this._usersService.getEmailUser(userId);
+        await this._notificationsService.addLogNotification(
+          {
+            userId,
+            notificationType: 'INFO',
+            messageContent: `Mengirimkan notifikasi permintaan pembayaran ${paymentId} pada penyewaan ${rentalId} dengan biaya ${cost} kepada pengguna`,
+          }
+        );
         const result = await this._mailSender.sendNotificationRentalPaymentToUser(userId, rentalId, paymentId, cost, startDate, endDate, email);
         console.log(result);
       } catch (error) {
