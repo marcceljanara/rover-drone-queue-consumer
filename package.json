@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:prod": "node src/consumer.js"
+    "start": "node src/consumer.js",
+    "start:dev": "nodemon src/consumer.js"
   },
   "keywords": [],
   "author": "",
