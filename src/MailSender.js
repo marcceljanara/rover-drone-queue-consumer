@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import fs from 'fs-extra';
  
 class MailSender {
   constructor() {
@@ -23,14 +24,14 @@ class MailSender {
     return await this._transporter.sendMail(mailOptions);
   }
 
-  async sendNotificationPaymentSuccess(email, fullname) {
+  async sendNotificationPaymentSuccess(email, fullname, pdfPath) {
     const mailOptions = {
       from: process.env.SMTP_EMAIL,
       to: email,
       subject: 'Pembayaran Berhasil Terverifikasi',
       text: `
       Halo ${fullname},
-      
+
       Kami dengan senang hati menginformasikan bahwa pembayaran Anda telah berhasil diverifikasi. Berikut adalah detail transaksi Anda:
 
       -----------------------------------------
@@ -43,8 +44,20 @@ class MailSender {
       Hormat kami,
       Tim Support
     `,
+      attachments: [
+        {
+          filename: 'Struk-Pembayaran.pdf',
+          path: pdfPath,
+        },
+      ],
     };
-    return await this._transporter.sendMail(mailOptions);
+
+    const result = await this._transporter.sendMail(mailOptions);
+    
+    // Hapus file PDF setelah email dikirim
+    await fs.unlink(pdfPath);
+    
+    return result;
   }
 
   async sendNotificationPaymentFailed(email, fullname, rentalId) {
@@ -125,8 +138,10 @@ async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate
   - BCA: 1122334455 (a.n. PT Rental Indonesia)
   
   Pastikan untuk mencantumkan Payment ID sebagai berita transfer untuk mempermudah proses verifikasi.
+
+
   
-  Jika Anda membutuhkan bantuan lebih lanjut, silakan hubungi kami.
+  Jika Anda membutuhkan bantuan lebih lanjut, silakan hubungi kami melalui email inengahmarcceljbc@gmail.com.
   
   Terima kasih,
   Tim Rental

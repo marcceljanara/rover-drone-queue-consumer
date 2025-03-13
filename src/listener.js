@@ -1,8 +1,9 @@
 class Listener {
-    constructor(mailSender, usersService, notificationsService) {
+    constructor(mailSender, usersService, notificationsService, receiptService) {
       this._mailSender = mailSender;
       this._usersService = usersService;
       this._notificationsService = notificationsService;
+      this._receiptService = receiptService;
 
       this.listenOtp = this.listenOtp.bind(this);
       this.listenPaymentsSuccess = this.listenPaymentsSuccess.bind(this);
@@ -31,16 +32,20 @@ class Listener {
 
     async listenPaymentsSuccess(message) {
       try {
-        const { email, fullname } = JSON.parse(message.content.toString());
-        const id = await this._usersService.getUserId(email);
-        await this._notificationsService.addLogNotification(
-          {
-            userId: id,
-            notificationType: 'INFO',
-            messageContent: `Mengirimkan notifikasi pembayaran sukses kepada ${fullname} dengan email: ${email}`,
-          }
-        );
-        const result = await this._mailSender.sendNotificationPaymentSuccess(email, fullname);
+        const { email, fullname, userId, paymentId } = JSON.parse(message.content.toString());
+  
+        await this._notificationsService.addLogNotification({
+          userId,
+          notificationType: 'INFO',
+          messageContent: `Mengirimkan notifikasi pembayaran sukses kepada ${fullname} dengan email: ${email}`,
+        });
+  
+        // Generate struk pembayaran dengan data lengkap
+        const pdfPath = await this._receiptService.generateReceipt(fullname, paymentId);
+  
+        // Kirim email dengan lampiran struk PDF
+        const result = await this._mailSender.sendNotificationPaymentSuccess(email, fullname, pdfPath);
+        
         console.log(result);
       } catch (error) {
         console.error(error);
