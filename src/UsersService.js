@@ -32,6 +32,15 @@ class UsersService {
         const result = await this._pool.query(query);
         return result.rows[0].id;
     }
+
+    async getPaymentById(id) {
+        const query = {
+            text: `SELECT * FROM payments WHERE id = $1`,
+            values: [id],
+        }
+        const result = await this._pool.query(query);
+        return result.rows[0];
+    }
 }
 
 export default UsersService;
