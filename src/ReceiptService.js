@@ -16,6 +16,7 @@ class ReceiptService {
     }
 
     const browser = await puppeteer.launch({
+      headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       timeout: 60000 // Menambah waktu timeout 1 menit
     });
