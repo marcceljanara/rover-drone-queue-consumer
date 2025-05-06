@@ -15,7 +15,11 @@ class ReceiptService {
       throw new Error(`Payment ID ${paymentId} tidak ditemukan.`);
     }
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      timeout: 60000 // Menambah waktu timeout 1 menit
+    });
+    
     const page = await browser.newPage();
 
     // HTML template untuk struk PDF

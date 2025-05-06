@@ -141,7 +141,7 @@ async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate
 
 
   
-  Jika Anda membutuhkan bantuan lebih lanjut, silakan hubungi kami melalui email inengahmarcceljbc@gmail.com.
+  Jika Anda memerlukan bantuan atau ingin melakukan verifikasi bukti pembayaran, silakan hubungi kami melalui email di inengahmarcceljbc@gmail.com.
   
   Terima kasih,
   Tim Rental
