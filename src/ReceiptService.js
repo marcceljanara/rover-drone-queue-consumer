@@ -17,8 +17,9 @@ class ReceiptService {
     let browser;
     try {
       browser = await puppeteer.launch({
-        headless: true, // Lebih kompatibel daripada 'new' untuk server
+        headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: '/snap/bin/chromium', // Menunjukkan lokasi Chromium yang benar
         timeout: 60000 // 60 detik
       });
 
