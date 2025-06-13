@@ -21,7 +21,7 @@ class MailSender {
       text: `Kode OTP Anda adalah: ${otp}. Berlaku selama 15 menit.`,
     };
 
-    return await this._transporter.sendMail(mailOptions);
+    return this._transporter.sendMail(mailOptions);
   }
 
   async sendNotificationPaymentSuccess(email, fullname, pdfPath) {
@@ -85,10 +85,18 @@ class MailSender {
       Tim Support
       `,
     };
-    return await this._transporter.sendMail(mailOptions);
+    return this._transporter.sendMail(mailOptions);
   }
 
-  async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate, endDate, emailsDb) {
+  async sendNotificationRentalRequest(
+    userId,
+    rentalId,
+    paymentId,
+    cost,
+    startDate,
+    endDate,
+    emailsDb,
+  ) {
     const emails = emailsDb.map((row) => row.email);
     const mailOptions = {
       from: process.env.SMTP_EMAIL,
@@ -111,10 +119,18 @@ class MailSender {
       Sistem Otomasi
     `,
     };
-    return await this._transporter.sendMail(mailOptions);
+    return this._transporter.sendMail(mailOptions);
   }
 
-  async sendNotificationRentalPaymentToUser(userId, rentalId, paymentId, cost, startDate, endDate, email) {
+  async sendNotificationRentalPaymentToUser(
+    userId,
+    rentalId,
+    paymentId,
+    cost,
+    startDate,
+    endDate,
+    email,
+  ) {
     const mailOptions = {
       from: process.env.SMTP_EMAIL,
       to: email,
@@ -147,7 +163,53 @@ class MailSender {
   Tim Rental
       `,
     };
-    return await this._transporter.sendMail(mailOptions);
+    return this._transporter.sendMail(mailOptions);
+  }
+
+  async sendNotificationExtensionRequest(
+    id,
+    userId,
+    rentalId,
+    paymentId,
+    cost,
+    addedDuration,
+    newEndDate,
+    emailsDb,
+  ) {
+    const formattedEndDate = new Date(newEndDate).toLocaleString('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      weekday: 'long', // misalnya: Senin
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const emails = emailsDb.map((row) => row.email);
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: emails.join(','), // Gabungkan email admin atau pihak terkait
+      subject: `Permohonan Perpanjangan Penyewaan dari User ${userId}`,
+      text: `
+      Halo,
+
+      User dengan ID ${userId} telah mengajukan perpanjangan penyewaan dengan detail sebagai berikut:
+
+      - ID Perpanjangan ${id}
+      - ID Penyewaan: ${rentalId}
+      - ID Pembayaran: ${paymentId}
+      - Biaya Tambahan: ${cost}
+      - Durasi Tambahan: ${addedDuration} bulan
+      - Tanggal Selesai Baru: ${formattedEndDate}
+
+      Mohon untuk segera meninjau permohonan perpanjangan ini. Terima kasih.
+
+      Salam,
+      Sistem Otomasi
+    `,
+    };
+    return this._transporter.sendMail(mailOptions);
   }
 }
 

@@ -10,6 +10,7 @@ class Listener {
     this.listenPaymentsFailed = this.listenPaymentsFailed.bind(this);
     this.listenRentalRequest = this.listenRentalRequest.bind(this);
     this.listenRentalPayment = this.listenRentalPayment.bind(this);
+    this.listenExtensionRequest = this.listenExtensionRequest.bind(this);
   }
 
   async listenOtp(message) {
@@ -46,7 +47,8 @@ class Listener {
       const pdfPath = await this._receiptService.generateReceipt(fullname, paymentId);
 
       // Kirim email dengan lampiran struk PDF
-      const result = await this._mailSender.sendNotificationPaymentSuccess(email, fullname, pdfPath);
+      const result = await this._mailSender
+        .sendNotificationPaymentSuccess(email, fullname, pdfPath);
 
       console.log(result);
     } catch (error) {
@@ -57,7 +59,8 @@ class Listener {
   async listenPaymentsFailed(message) {
     try {
       const { email, fullname, rentalId } = JSON.parse(message.content.toString());
-      const result = await this._mailSender.sendNotificationPaymentFailed(email, fullname, rentalId);
+      const result = await this._mailSender
+        .sendNotificationPaymentFailed(email, fullname, rentalId);
       const id = await this._usersService.getUserId(email);
       await this._notificationsService.addLogNotification(
         {
@@ -78,7 +81,15 @@ class Listener {
         userId, rentalId, paymentId, cost, startDate, endDate,
       } = JSON.parse(message.content.toString());
       const emailsDb = await this._usersService.getAllEmailAdmin();
-      const result = await this._mailSender.sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate, endDate, emailsDb);
+      const result = await this._mailSender.sendNotificationRentalRequest(
+        userId,
+        rentalId,
+        paymentId,
+        cost,
+        startDate,
+        endDate,
+        emailsDb,
+      );
       await this._notificationsService.addLogNotification(
         {
           userId,
@@ -105,7 +116,48 @@ class Listener {
           messageContent: `Mengirimkan notifikasi permintaan pembayaran ${paymentId} pada penyewaan ${rentalId} dengan biaya ${cost} kepada pengguna`,
         },
       );
-      const result = await this._mailSender.sendNotificationRentalPaymentToUser(userId, rentalId, paymentId, cost, startDate, endDate, email);
+      const result = await this._mailSender.sendNotificationRentalPaymentToUser(
+        userId,
+        rentalId,
+        paymentId,
+        cost,
+        startDate,
+        endDate,
+        email,
+      );
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async listenExtensionRequest(message) {
+    try {
+      const {
+        id, userId, rentalId, paymentId, cost, addedDuration, endDate,
+      } = JSON.parse(message.content.toString());
+      const emailsDb = await this._usersService.getAllEmailAdmin();
+      // console.log('emailsDb:', emailsDb);
+      // console.log('typeof emailsDb:', typeof emailsDb);
+      // console.log('Array.isArray(emailsDb):', Array.isArray(emailsDb));
+
+      const result = await this._mailSender.sendNotificationExtensionRequest(
+        id,
+        userId,
+        rentalId,
+        paymentId,
+        cost,
+        addedDuration,
+        endDate,
+        emailsDb,
+      );
+      await this._notificationsService.addLogNotification(
+        {
+          userId,
+          notificationType: 'INFO',
+          messageContent: 'Mengirimkan notifikasi permintaan perpanjangan rental kepada admin agar bisa diproses',
+        },
+      );
       console.log(result);
     } catch (error) {
       console.log(error);
