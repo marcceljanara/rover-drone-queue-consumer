@@ -11,6 +11,7 @@ class Listener {
     this.listenRentalRequest = this.listenRentalRequest.bind(this);
     this.listenRentalPayment = this.listenRentalPayment.bind(this);
     this.listenExtensionRequest = this.listenExtensionRequest.bind(this);
+    this.listenExtensionPayment = this.listenExtensionPayment.bind(this);
   }
 
   async listenOtp(message) {
@@ -137,10 +138,6 @@ class Listener {
         id, userId, rentalId, paymentId, cost, addedDuration, endDate,
       } = JSON.parse(message.content.toString());
       const emailsDb = await this._usersService.getAllEmailAdmin();
-      // console.log('emailsDb:', emailsDb);
-      // console.log('typeof emailsDb:', typeof emailsDb);
-      // console.log('Array.isArray(emailsDb):', Array.isArray(emailsDb));
-
       const result = await this._mailSender.sendNotificationExtensionRequest(
         id,
         userId,
@@ -161,6 +158,37 @@ class Listener {
       console.log(result);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async listenExtensionPayment(message) {
+    try {
+      const {
+        userId, id: extensionId, rentalId, paymentId, cost, endDate, addedDuration,
+      } = JSON.parse(message.content.toString());
+
+      const email = await this._usersService.getEmailUser(userId);
+
+      await this._notificationsService.addLogNotification({
+        userId,
+        notificationType: 'INFO',
+        messageContent: `Mengirimkan notifikasi pembayaran perpanjangan ${paymentId} untuk rental ${rentalId} selama ${addedDuration} bulan.`,
+      });
+
+      const result = await this._mailSender.sendNotificationExtensionPaymentToUser(
+        userId,
+        rentalId,
+        extensionId,
+        paymentId,
+        cost,
+        endDate,
+        addedDuration,
+        email,
+      );
+
+      console.log('Extension payment notification sent:', result);
+    } catch (error) {
+      console.error('Error in listenExtensionPayment:', error);
     }
   }
 }

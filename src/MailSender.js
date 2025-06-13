@@ -211,6 +211,58 @@ class MailSender {
     };
     return this._transporter.sendMail(mailOptions);
   }
+
+  async sendNotificationExtensionPaymentToUser(
+    userId,
+    rentalId,
+    extensionId,
+    paymentId,
+    cost,
+    endDate,
+    addedDuration,
+    email,
+  ) {
+    const formattedEndDate = new Date(endDate).toLocaleDateString('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: `Segera Lakukan Pembayaran Perpanjangan untuk Rental ID ${rentalId}`,
+      text: `
+      Halo,
+
+      Kami ingin menginformasikan bahwa permohonan *perpanjangan* rental Anda telah diterima dengan detail sebagai berikut:
+
+      - Rental ID: ${rentalId}
+      - Extension ID: ${extensionId}
+      - Payment ID: ${paymentId}
+      - Biaya Tambahan: Rp${cost.toLocaleString('id-ID')}
+      - Durasi Tambahan: ${addedDuration} bulan
+      - Tanggal Selesai Baru: ${formattedEndDate}
+
+      Harap segera melakukan pembayaran untuk melanjutkan penyewaan. Berikut informasi rekening:
+
+      Rekening Bank:
+      - BNI: 1234567890 (a.n. PT Rental Indonesia)
+      - BRI: 9876543210 (a.n. PT Rental Indonesia)
+      - BCA: 1122334455 (a.n. PT Rental Indonesia)
+
+      Pastikan mencantumkan Payment ID sebagai berita transfer untuk mempermudah proses verifikasi.
+
+      Jika Anda butuh bantuan atau ingin melakukan verifikasi bukti pembayaran, silakan hubungi kami di inengahmarcceljbc@gmail.com.
+
+      Terima kasih,
+      Tim Rental
+    `,
+    };
+
+    return this._transporter.sendMail(mailOptions);
+  }
 }
 
 export default MailSender;
