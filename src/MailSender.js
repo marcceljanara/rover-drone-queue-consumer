@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import fs from 'fs-extra';
- 
+
 class MailSender {
   constructor() {
     this._transporter = nodemailer.createTransport({
@@ -53,10 +53,10 @@ class MailSender {
     };
 
     const result = await this._transporter.sendMail(mailOptions);
-    
+
     // Hapus file PDF setelah email dikirim
     await fs.unlink(pdfPath);
-    
+
     return result;
   }
 
@@ -86,15 +86,15 @@ class MailSender {
       `,
     };
     return await this._transporter.sendMail(mailOptions);
-}
+  }
 
-async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate, endDate, emailsDb) {
-  const emails = emailsDb.map(row => row.email);
-  const mailOptions = {
-    from: process.env.SMTP_EMAIL,
-    to: emails.join(','), // Menggabungkan array emails menjadi string yang dipisahkan koma
-    subject: `Permohonan Penyewaan dari User ${userId}`,
-    text: `
+  async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate, endDate, emailsDb) {
+    const emails = emailsDb.map((row) => row.email);
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: emails.join(','), // Menggabungkan array emails menjadi string yang dipisahkan koma
+      subject: `Permohonan Penyewaan dari User ${userId}`,
+      text: `
       Halo,
 
       User dengan ID ${userId} telah mengajukan permohonan penyewaan dengan detail sebagai berikut:
@@ -110,9 +110,9 @@ async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate
       Salam,
       Sistem Otomasi
     `,
-  };
-  return await this._transporter.sendMail(mailOptions);
-}
+    };
+    return await this._transporter.sendMail(mailOptions);
+  }
 
   async sendNotificationRentalPaymentToUser(userId, rentalId, paymentId, cost, startDate, endDate, email) {
     const mailOptions = {
@@ -145,11 +145,10 @@ async sendNotificationRentalRequest(userId, rentalId, paymentId, cost, startDate
   
   Terima kasih,
   Tim Rental
-      `
+      `,
     };
     return await this._transporter.sendMail(mailOptions);
-  } 
-
+  }
 }
 
 export default MailSender;

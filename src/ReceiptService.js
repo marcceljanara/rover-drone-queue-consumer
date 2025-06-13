@@ -20,7 +20,7 @@ class ReceiptService {
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         executablePath: '/snap/bin/chromium', // Menunjukkan lokasi Chromium yang benar
-        timeout: 60000 // 60 detik
+        timeout: 60000, // 60 detik
       });
 
       const page = await browser.newPage();
