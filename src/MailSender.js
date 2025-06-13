@@ -263,6 +263,34 @@ class MailSender {
 
     return this._transporter.sendMail(mailOptions);
   }
+
+  async sendNotificationShipmentStatusToUser(shipmentId, email, status, fullname) {
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: `Status Pengiriman ${shipmentId}: ${status}`,
+      text: `
+      Halo ${fullname},
+
+      Kami ingin memberi tahu bahwa status terbaru untuk pengiriman Anda telah diperbarui.
+
+      -----------------------------------------
+      ID Pengiriman   : ${shipmentId}
+      Nama Penerima   : ${fullname}
+      Status Terkini  : ${status.toUpperCase()}
+      -----------------------------------------
+
+      Silakan pantau terus status pengiriman Anda. Jika Anda membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi kami melalui email ini.
+
+      Terima kasih telah menggunakan layanan kami.
+
+      Hormat kami,  
+      Tim Support
+          `,
+    };
+
+    return this._transporter.sendMail(mailOptions);
+  }
 }
 
 export default MailSender;

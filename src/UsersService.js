@@ -42,6 +42,22 @@ class UsersService {
     const result = await this._pool.query(query);
     return result.rows[0];
   }
+
+  async getUserByShipmentId(id) {
+    const query = {
+      text: `
+      SELECT users.email, users.fullname, users.id
+      FROM shipment_orders
+      JOIN rentals ON shipment_orders.rental_id = rentals.id
+      JOIN users ON rentals.user_id = users.id
+      WHERE shipment_orders.id = $1
+    `,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows[0]; // pakai chaining untuk hindari error kalau tidak ada hasil
+  }
 }
 
 export default UsersService;

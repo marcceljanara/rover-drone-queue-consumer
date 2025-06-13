@@ -12,6 +12,7 @@ class Listener {
     this.listenRentalPayment = this.listenRentalPayment.bind(this);
     this.listenExtensionRequest = this.listenExtensionRequest.bind(this);
     this.listenExtensionPayment = this.listenExtensionPayment.bind(this);
+    this.listenShipmentStatus = this.listenShipmentStatus.bind(this);
   }
 
   async listenOtp(message) {
@@ -189,6 +190,32 @@ class Listener {
       console.log('Extension payment notification sent:', result);
     } catch (error) {
       console.error('Error in listenExtensionPayment:', error);
+    }
+  }
+
+  async listenShipmentStatus(message) {
+    try {
+      const {
+        shipmentId,
+        status,
+      } = JSON.parse(message.content.toString());
+      const { email, fullname, id } = await this._usersService.getUserByShipmentId(shipmentId);
+
+      await this._notificationsService.addLogNotification({
+        userId: id,
+        notificationType: 'INFO',
+        messageContent: `Mengirimkan notifikasi status pengiriman ${status} untukshipment ${shipmentId}.`,
+      });
+      const result = await this._mailSender.sendNotificationShipmentStatusToUser(
+        shipmentId,
+        email,
+        status,
+        fullname,
+      );
+
+      console.log('Shipment notification sent:', result);
+    } catch (error) {
+      console.error('Error in listenShipmentStatus:', error);
     }
   }
 }
