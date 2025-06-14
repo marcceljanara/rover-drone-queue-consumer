@@ -9,11 +9,11 @@ import NotificationsService from './NotificationsService.js';
 dotenv.config();
 
 const init = async () => {
-  const mailSenser = new MailSender();
+  const mailSender = new MailSender();
   const usersService = new UsersService();
   const notificationsService = new NotificationsService();
   const receiptService = new ReceiptService(usersService);
-  const listener = new Listener(mailSenser, usersService, notificationsService, receiptService);
+  const listener = new Listener(mailSender, usersService, notificationsService, receiptService);
 
   const connection = await amqp.connect(process.env.RABBITMQ_SERVER);
   const channel = await connection.createChannel();
@@ -42,6 +42,9 @@ const init = async () => {
     durable: true,
   });
   await channel.assertQueue('rental:almost-end', {
+    durable: true,
+  });
+  await channel.assertQueue('rental:awaitingreturn', {
     durable: true,
   });
   channel.consume('otp:register', listener.listenOtp, { noAck: true });
