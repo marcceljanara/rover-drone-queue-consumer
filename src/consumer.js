@@ -41,11 +41,15 @@ const init = async () => {
   await channel.assertQueue('shipment:status', {
     durable: true,
   });
+  await channel.assertQueue('rental:almost-end', {
+    durable: true,
+  });
   channel.consume('otp:register', listener.listenOtp, { noAck: true });
   channel.consume('payment:success', listener.listenPaymentsSuccess, { noAck: true });
   channel.consume('payment:failed', listener.listenPaymentsFailed, { noAck: true });
   channel.consume('rental:request', listener.listenRentalRequest, { noAck: true });
   channel.consume('rental:payment', listener.listenRentalPayment, { noAck: true });
+  channel.consume('rental:almost-end', listener.listenShipmentStatus, { noAck: true });
   channel.consume('extension:request', listener.listenExtensionRequest, { noAck: true });
   channel.consume('extension:payment', listener.listenExtensionPayment, { noAck: true });
   channel.consume('shipment:status', listener.listenShipmentStatus, { noAck: true });

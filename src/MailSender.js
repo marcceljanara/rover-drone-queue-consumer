@@ -291,6 +291,34 @@ class MailSender {
 
     return this._transporter.sendMail(mailOptions);
   }
+
+  async sendNotificationRentalAlmostEnd(email, fullname, rentalId, endDate) {
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: `Masa Sewa Perangkat Akan Berakhir (${rentalId})`,
+      text: `
+      Halo ${fullname},
+
+      Kami ingin mengingatkan bahwa masa sewa perangkat Anda akan segera berakhir.
+
+      -----------------------------------------
+      Nama Pengguna : ${fullname}
+      Rental ID     : ${rentalId}
+      Tanggal Berakhir: ${new Date(endDate).toLocaleDateString('id-ID')}
+      -----------------------------------------
+
+      Silakan perpanjang masa sewa Anda jika masih ingin menggunakan perangkat ini. Jika tidak diperpanjang, perangkat akan dijadwalkan untuk dikembalikan.
+
+      Terima kasih telah menggunakan layanan kami.
+
+      Hormat kami,  
+      Tim Support
+          `,
+    };
+
+    return this._transporter.sendMail(mailOptions);
+  }
 }
 
 export default MailSender;
