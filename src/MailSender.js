@@ -319,6 +319,40 @@ class MailSender {
 
     return this._transporter.sendMail(mailOptions);
   }
+
+  async sendNotificationRentalAwaitingReturn(email, fullname, rentalId, endDate) {
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: `Masa Sewa Telah Selesai - Rental ID ${rentalId}`,
+      text: `
+    Halo ${fullname},
+
+    Kami ingin memberitahukan bahwa masa sewa perangkat Anda telah berakhir pada:
+
+    -----------------------------------------
+    Nama Pengguna : ${fullname}
+    Rental ID     : ${rentalId}
+    Tanggal Berakhir: ${new Date(endDate).toLocaleDateString('id-ID')}
+    Status Rental : Menunggu Pengembalian
+    -----------------------------------------
+
+    📦 Perangkat Anda dijadwalkan untuk diambil oleh petugas dalam waktu dekat.
+
+    🕒 Anda memiliki waktu 2 hari sejak email ini dikirimkan untuk memperbarui alamat pengambilan perangkat jika diperlukan.  
+    Jika Anda tidak melakukan perubahan dalam waktu tersebut, maka sistem akan otomatis menggunakan alamat utama yang terdaftar pada akun Anda.
+
+    Untuk bantuan lebih lanjut, silakan hubungi tim support kami melalui email ini.
+
+    Terima kasih telah menggunakan layanan kami.
+
+    Hormat kami,  
+    Tim Support
+        `,
+    };
+
+    return this._transporter.sendMail(mailOptions);
+  }
 }
 
 export default MailSender;

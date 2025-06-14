@@ -14,6 +14,7 @@ class Listener {
     this.listenExtensionPayment = this.listenExtensionPayment.bind(this);
     this.listenShipmentStatus = this.listenShipmentStatus.bind(this);
     this.listenRentalAlmostEnd = this.listenRentalAlmostEnd.bind(this);
+    this.listenRentalAwaitingReturn = this.listenRentalAwaitingReturn.bind(this);
   }
 
   async listenOtp(message) {
@@ -244,6 +245,33 @@ class Listener {
       console.log(result);
     } catch (error) {
       console.error('❌ Error in listenRentalAlmostEnd:', error);
+    }
+  }
+
+  async listenRentalAwaitingReturn(message) {
+    try {
+      const {
+        to: email, data,
+      } = JSON.parse(message.content.toString());
+      const {
+        fullname, rentalId, endDate,
+      } = data;
+
+      // Kirim email ke pengguna
+      const result = await this._mailSender
+        .sendNotificationRentalAwaitingReturn(email, fullname, rentalId, endDate);
+
+      // Tambahkan ke log notifikasi
+      const userId = await this._usersService.getUserId(email);
+      await this._notificationsService.addLogNotification({
+        userId,
+        notificationType: 'INFO',
+        messageContent: `Mengirimkan notifikasi masa sewa selesai kepada ${fullname} (${email}) untuk rental: ${rentalId}`,
+      });
+
+      console.log(result);
+    } catch (error) {
+      console.error('❌ Error in listenRentalAwaitingReturn:', error);
     }
   }
 }
