@@ -47,6 +47,9 @@ const init = async () => {
   await channel.assertQueue('rental:awaitingreturn', {
     durable: true,
   });
+  await channel.assertQueue('auth.reset_password', {
+    durable: true,
+  });
   channel.consume('otp:register', listener.listenOtp, { noAck: true });
   channel.consume('payment:success', listener.listenPaymentsSuccess, { noAck: true });
   channel.consume('payment:failed', listener.listenPaymentsFailed, { noAck: true });
@@ -57,6 +60,7 @@ const init = async () => {
   channel.consume('extension:request', listener.listenExtensionRequest, { noAck: true });
   channel.consume('extension:payment', listener.listenExtensionPayment, { noAck: true });
   channel.consume('shipment:status', listener.listenShipmentStatus, { noAck: true });
+  channel.consume('auth.reset_password', listener.listenAuthResetPassword, { noAck: true });
 };
 
 init();

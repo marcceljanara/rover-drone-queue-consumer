@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import autobind from 'auto-bind';
+
 class Listener {
   constructor(mailSender, usersService, notificationsService, receiptService) {
     this._mailSender = mailSender;
@@ -5,16 +8,7 @@ class Listener {
     this._notificationsService = notificationsService;
     this._receiptService = receiptService;
 
-    this.listenOtp = this.listenOtp.bind(this);
-    this.listenPaymentsSuccess = this.listenPaymentsSuccess.bind(this);
-    this.listenPaymentsFailed = this.listenPaymentsFailed.bind(this);
-    this.listenRentalRequest = this.listenRentalRequest.bind(this);
-    this.listenRentalPayment = this.listenRentalPayment.bind(this);
-    this.listenExtensionRequest = this.listenExtensionRequest.bind(this);
-    this.listenExtensionPayment = this.listenExtensionPayment.bind(this);
-    this.listenShipmentStatus = this.listenShipmentStatus.bind(this);
-    this.listenRentalAlmostEnd = this.listenRentalAlmostEnd.bind(this);
-    this.listenRentalAwaitingReturn = this.listenRentalAwaitingReturn.bind(this);
+    autobind(this);
   }
 
   async listenOtp(message) {
@@ -272,6 +266,26 @@ class Listener {
       console.log(result);
     } catch (error) {
       console.error('❌ Error in listenRentalAwaitingReturn:', error);
+    }
+  }
+
+  async listenAuthResetPassword(message) {
+    try {
+      console.log(message.content.toString());
+      const {
+        userId,
+        email,
+        token,
+      } = JSON.parse(message.content.toString());
+      await this._notificationsService.addLogNotification({
+        userId,
+        notificationType: 'INFO',
+        messageContent: `Mengirimkan notifikasi reset password ke ${email}.`,
+      });
+      const result = await this._mailSender.sendResetPasswordEmail(userId, email, token);
+      console.log(result);
+    } catch (error) {
+      console.error(error);
     }
   }
 }

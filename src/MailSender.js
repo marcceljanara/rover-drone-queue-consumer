@@ -353,6 +353,39 @@ class MailSender {
 
     return this._transporter.sendMail(mailOptions);
   }
+
+  async sendResetPasswordEmail(userId, email, token) {
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: `Permintaan Reset Password (${userId})`,
+      text: `
+    Halo,
+
+    Kami menerima permintaan untuk mereset password akun Anda.
+
+    -----------------------------------------
+    User ID        : ${userId}
+    Email Terdaftar: ${email}
+    -----------------------------------------
+
+    Untuk melanjutkan proses reset password, silakan klik link di bawah ini:
+    ${token}
+
+    Catatan penting:
+    - Link hanya berlaku selama 1 jam.
+    - Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini.
+    - Demi keamanan, jangan bagikan link ini kepada siapa pun.
+
+    Terima kasih telah menggunakan layanan kami.
+
+    Hormat kami,
+    Tim Support
+    `,
+    };
+
+    return this._transporter.sendMail(mailOptions);
+  }
 }
 
 export default MailSender;
