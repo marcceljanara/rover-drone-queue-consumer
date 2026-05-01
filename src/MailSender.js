@@ -4,18 +4,20 @@ import fs from 'fs-extra';
 class MailSender {
   constructor() {
     this._transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
+      service: 'gmail',
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
       auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_APP_PASSWORD,
       },
     });
   }
 
   async sendOtpMail(email, otp) {
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Kode OTP Anda',
       text: `Kode OTP Anda adalah: ${otp}. Berlaku selama 15 menit.`,
@@ -26,7 +28,7 @@ class MailSender {
 
   async sendNotificationPaymentSuccess(email, fullname, pdfPath) {
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Pembayaran Berhasil Terverifikasi',
       text: `
@@ -62,7 +64,7 @@ class MailSender {
 
   async sendNotificationPaymentFailed(email, fullname, rentalId) {
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: `Pembayaran untuk Rental ID ${rentalId} Gagal`,
       text: `
@@ -99,7 +101,7 @@ class MailSender {
   ) {
     const emails = emailsDb.map((row) => row.email);
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: emails.join(','), // Menggabungkan array emails menjadi string yang dipisahkan koma
       subject: `Permohonan Penyewaan dari User ${userId}`,
       text: `
@@ -132,7 +134,7 @@ class MailSender {
     email,
   ) {
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: `Segera Lakukan Pembayaran untuk Rental ID ${rentalId}`,
       text: `
@@ -188,7 +190,7 @@ class MailSender {
 
     const emails = emailsDb.map((row) => row.email);
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: emails.join(','), // Gabungkan email admin atau pihak terkait
       subject: `Permohonan Perpanjangan Penyewaan dari User ${userId}`,
       text: `
@@ -230,7 +232,7 @@ class MailSender {
     });
 
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: `Segera Lakukan Pembayaran Perpanjangan untuk Rental ID ${rentalId}`,
       text: `
@@ -266,7 +268,7 @@ class MailSender {
 
   async sendNotificationShipmentStatusToUser(shipmentId, email, status, fullname) {
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: `Status Pengiriman ${shipmentId}: ${status}`,
       text: `
@@ -294,7 +296,7 @@ class MailSender {
 
   async sendNotificationRentalAlmostEnd(email, fullname, rentalId, endDate) {
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: `Masa Sewa Perangkat Akan Berakhir (${rentalId})`,
       text: `
@@ -322,7 +324,7 @@ class MailSender {
 
   async sendNotificationRentalAwaitingReturn(email, fullname, rentalId, endDate) {
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Platform'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: `Masa Sewa Telah Selesai - Rental ID ${rentalId}`,
       text: `
