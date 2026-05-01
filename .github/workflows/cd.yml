@@ -18,7 +18,7 @@ jobs:
         password: ${{ secrets.SSH_PASSWORD }}
         port: ${{ secrets.SSH_PORT }}
         script: |
-          cd ~/rover-drone-queue-consumer
+          cd ~/project/rover-drone-queue-consumer
           git pull origin main
           npm install
           pm2 restart rover-drone-queue
