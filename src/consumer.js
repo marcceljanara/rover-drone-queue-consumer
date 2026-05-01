@@ -15,7 +15,13 @@ const init = async () => {
   const receiptService = new ReceiptService(usersService);
   const listener = new Listener(mailSender, usersService, notificationsService, receiptService);
 
-  const connection = await amqp.connect(process.env.RABBITMQ_SERVER);
+  let connection;
+  try {
+    connection = await amqp.connect(process.env.RABBITMQ_SERVER);
+  } catch (error) {
+    console.error('Error connecting to RabbitMQ:', error);
+    process.exit(1);
+  }
   const channel = await connection.createChannel();
   await channel.assertQueue('otp:register', {
     durable: true,
