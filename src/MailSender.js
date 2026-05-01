@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 
 class MailSender {
   constructor() {
+    // hanya untuk gmail aja, untuk provider lain bisa disesuaikan
     this._transporter = nodemailer.createTransport({
       service: 'gmail',
       pool: true,
